@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { spawn } from 'child_process';
+import { execa } from 'execa';
 import { existsSync, mkdirSync, readdirSync, statSync } from 'fs';
 import inquirer from 'inquirer';
 import { join, resolve } from 'path';
@@ -13,31 +13,20 @@ export interface WorktreeInfo {
 
 export class WorktreeManager {
   private async runGitCommand(command: string, cwd?: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const gitProcess = spawn('git', command.split(' '), {
+    try {
+      // Split command properly, handling quoted strings
+      const args = command.match(/(?:[^\s"']+|"[^"]*"|'[^']*')/g) || [];
+      const { stdout } = await execa('git', args, {
         cwd,
         stdio: ['pipe', 'pipe', 'pipe'],
       });
-
-      let stdout = '';
-      let stderr = '';
-
-      gitProcess.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      gitProcess.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      gitProcess.on('close', (code) => {
-        if (code === 0) {
-          resolve(stdout.trim());
-        } else {
-          reject(new Error(`Git command failed: ${stderr}`));
-        }
-      });
-    });
+      return stdout.trim();
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Git command failed: ${error.message}`);
+      }
+      throw new Error(`Git command failed: ${error}`);
+    }
   }
 
   private async ensureGitRepo(): Promise<void> {
@@ -69,6 +58,21 @@ export class WorktreeManager {
   ): Promise<void> {
     await this.ensureGitRepo();
 
+    // Check if we're already in a worktree
+    try {
+      const worktreeRoot = await this.runGitCommand(
+        'rev-parse --git-common-dir'
+      );
+      const currentDir = await this.runGitCommand('rev-parse --show-toplevel');
+      if (worktreeRoot !== currentDir) {
+        throw new Error(
+          'Cannot create worktree from within another worktree. Please run this command from the main repository.'
+        );
+      }
+    } catch (error) {
+      // This is expected if we're in the main repository
+    }
+
     const projectName = await this.getProjectName();
     const worktreeName = `${projectName}-${feature}`;
     const worktreePath = resolve(worktreesPath, worktreeName);
@@ -84,11 +88,8 @@ export class WorktreeManager {
     }
 
     try {
-      // Create and checkout the branch
-      await this.runGitCommand(`checkout -b ${branch}`);
-
-      // Create the worktree
-      await this.runGitCommand(`worktree add ${worktreePath} ${branch}`);
+      // Create the worktree with a new branch
+      await this.runGitCommand(`worktree add -b ${branch} ${worktreePath}`);
 
       console.log(chalk.blue(`Created worktree: ${worktreeName}`));
       console.log(chalk.blue(`Path: ${worktreePath}`));
@@ -96,7 +97,11 @@ export class WorktreeManager {
     } catch (error) {
       // Cleanup if creation fails
       if (existsSync(worktreePath)) {
-        await this.runGitCommand(`worktree remove ${worktreePath} --force`);
+        try {
+          await this.runGitCommand(`worktree remove ${worktreePath} --force`);
+        } catch {
+          // Ignore cleanup errors
+        }
       }
       throw error;
     }
@@ -165,9 +170,20 @@ export class WorktreeManager {
   ): Promise<void> {
     await this.ensureGitRepo();
 
-    // Switch to target branch
-    await this.runGitCommand(`checkout ${targetBranch}`);
-    await this.runGitCommand('pull');
+    // Get the current branch name
+    const currentBranch = await this.runGitCommand('branch --show-current');
+
+    // Switch to target branch (use current branch if target doesn't exist)
+    try {
+      await this.runGitCommand(`checkout ${targetBranch}`);
+    } catch {
+      // If target branch doesn't exist, stay on current branch
+      console.log(
+        chalk.yellow(
+          `Target branch '${targetBranch}' not found, using current branch '${currentBranch}'`
+        )
+      );
+    }
 
     for (const worktreePath of paths) {
       if (!existsSync(worktreePath)) {
@@ -181,8 +197,8 @@ export class WorktreeManager {
           worktreePath
         );
 
-        // Merge the branch
-        await this.runGitCommand(`merge ${branch} -m "${message}"`);
+        // Merge the branch with no editor
+        await this.runGitCommand(`merge ${branch} --no-edit -m "${message}"`);
 
         console.log(chalk.blue(`Merged ${branch} into ${targetBranch}`));
       } catch (error) {

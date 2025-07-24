@@ -15,6 +15,25 @@ A CLI tool built with TypeScript and Commander for managing Git worktrees effici
 
 ## Installation
 
+### Quick Start (Global Installation)
+
+1. Clone this repository or download the files
+2. Install dependencies and build:
+   ```bash
+   npm install
+   npm run build
+   ```
+3. Install globally:
+   ```bash
+   npm install -g .
+   ```
+4. Test the installation:
+   ```bash
+   go-parallel --help
+   ```
+
+### Development Installation
+
 1. Clone this repository or download the files
 2. Install dependencies:
    ```bash
@@ -24,10 +43,16 @@ A CLI tool built with TypeScript and Commander for managing Git worktrees effici
    ```bash
    npm run build
    ```
-4. Make the CLI executable:
+4. Create a global link (for development):
+   ```bash
+   npm link
+   ```
+5. Make the CLI executable:
    ```bash
    chmod +x dist/index.js
    ```
+
+For detailed installation instructions, see [INSTALLATION.md](./INSTALLATION.md).
 
 ## Usage
 
@@ -212,9 +237,8 @@ go-parallel/
 
 ## Requirements
 
-- Node.js 16+
+- Node.js 18+
 - Git
-- TypeScript
 
 ## Development
 
