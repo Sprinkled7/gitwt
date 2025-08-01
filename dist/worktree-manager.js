@@ -201,21 +201,40 @@ export class WorktreeManager {
             try {
                 const status = await this.getWorktreeStatus(worktree.path);
                 if (status === 'clean') {
-                    if (!force) {
-                        const { confirm } = await inquirer.prompt([
-                            {
-                                type: 'confirm',
-                                name: 'confirm',
-                                message: `Remove clean worktree "${worktree.name}"?`,
-                                default: true,
-                            },
-                        ]);
-                        if (!confirm) {
-                            continue;
+                    // Check if the branch has been merged into the main branch
+                    const isMerged = await this.isBranchMerged(worktree.branch);
+                    if (isMerged) {
+                        if (!force) {
+                            const { confirm } = await inquirer.prompt([
+                                {
+                                    type: 'confirm',
+                                    name: 'confirm',
+                                    message: `Remove merged worktree "${worktree.name}" (branch: ${worktree.branch})?`,
+                                    default: true,
+                                },
+                            ]);
+                            if (!confirm) {
+                                continue;
+                            }
                         }
+                        // Remove the worktree
+                        await this.runGitCommand(`worktree remove ${worktree.path} --force`);
+                        // Delete the merged branch
+                        try {
+                            await this.runGitCommand(`branch -d ${worktree.branch}`);
+                            console.log(chalk.blue(`Deleted merged branch: ${worktree.branch}`));
+                        }
+                        catch (error) {
+                            console.log(chalk.yellow(`Warning: Could not delete branch ${worktree.branch}: ${error}`));
+                        }
+                        removedCount++;
                     }
-                    await this.removeWorktree(worktree.name.replace(/^[^-]+-/, ''), worktreesPath, true);
-                    removedCount++;
+                    else {
+                        console.log(chalk.yellow(`Skipping worktree "${worktree.name}" - branch ${worktree.branch} has not been merged`));
+                    }
+                }
+                else {
+                    console.log(chalk.yellow(`Skipping worktree "${worktree.name}" - has uncommitted changes`));
                 }
             }
             catch (error) {
@@ -223,6 +242,21 @@ export class WorktreeManager {
             }
         }
         return removedCount;
+    }
+    async isBranchMerged(branch) {
+        try {
+            // Get the current branch (main/master)
+            const currentBranch = await this.runGitCommand('branch --show-current');
+            // Check if the branch has been merged into the current branch
+            const mergeBase = await this.runGitCommand(`merge-base ${currentBranch} ${branch}`);
+            const branchCommit = await this.runGitCommand(`rev-parse ${branch}`);
+            // If merge-base equals branch commit, the branch is fully merged
+            return mergeBase === branchCommit;
+        }
+        catch (error) {
+            // If there's an error, assume the branch is not merged
+            return false;
+        }
     }
 }
 //# sourceMappingURL=worktree-manager.js.map

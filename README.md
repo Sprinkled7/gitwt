@@ -170,12 +170,20 @@ go-parallel remove user-authentication
 
 ### `clean`
 
-Cleans up merged worktrees that are in a clean state.
+Cleans up worktrees that have been merged into the main branch and are in a clean state.
 
 **Options:**
 
 - `-p, --path <path>`: Path to worktrees directory (default: `./worktrees`)
 - `-f, --force`: Force cleanup without confirmation
+
+**What it does:**
+
+- Only removes worktrees whose branches have been merged into the main branch
+- Skips worktrees with uncommitted changes
+- Skips worktrees whose branches haven't been merged yet
+- Deletes both the worktree and the merged branch
+- Provides clear feedback about what's being skipped and why
 
 **Example:**
 

@@ -14,5 +14,6 @@ export declare class WorktreeManager {
     mergeWorktrees(paths: string[], targetBranch: string, message: string): Promise<void>;
     removeWorktree(feature: string, worktreesPath: string, force?: boolean): Promise<void>;
     cleanWorktrees(worktreesPath: string, force?: boolean): Promise<number>;
+    private isBranchMerged;
 }
 //# sourceMappingURL=worktree-manager.d.ts.map

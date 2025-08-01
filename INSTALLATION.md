@@ -173,7 +173,7 @@ go-parallel merge worktrees/project-feature1 worktrees/project-feature2
 # Remove a worktree
 go-parallel remove my-feature
 
-# Clean up worktrees
+# Clean up merged worktrees
 go-parallel clean
 ```
 
