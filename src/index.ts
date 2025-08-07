@@ -2,14 +2,18 @@
 
 import chalk from 'chalk';
 import { Command } from 'commander';
+import path from 'path';
 import { WorktreeManager } from './worktree-manager.js';
 
 const program = new Command();
 
+// Default worktrees path: parent folder of current project
+const defaultWorktreesPath = path.join(process.cwd(), '..', 'worktrees');
+
 program
   .name('go-parallel')
   .description('CLI tool for managing Git worktrees')
-  .version('1.0.0');
+  .version('1.1.0');
 
 const worktreeManager = new WorktreeManager();
 
@@ -20,8 +24,8 @@ program
   .argument('<feature>', 'Feature name for the worktree')
   .option(
     '-p, --path <path>',
-    'Path to store worktrees (default: ./worktrees)',
-    './worktrees'
+    `Path to store worktrees (default: ${defaultWorktreesPath})`,
+    defaultWorktreesPath
   )
   .option('-b, --branch <branch>', 'Branch name (default: feature/<feature>)')
   .action(async (feature, options) => {
@@ -43,8 +47,8 @@ program
   .description('List all current worktrees')
   .option(
     '-p, --path <path>',
-    'Path to worktrees directory (default: ./worktrees)',
-    './worktrees'
+    `Path to worktrees directory (default: ${defaultWorktreesPath})`,
+    defaultWorktreesPath
   )
   .action(async (options) => {
     try {
@@ -101,8 +105,8 @@ program
   .argument('<feature>', 'Feature name of the worktree to remove')
   .option(
     '-p, --path <path>',
-    'Path to worktrees directory (default: ./worktrees)',
-    './worktrees'
+    `Path to worktrees directory (default: ${defaultWorktreesPath})`,
+    defaultWorktreesPath
   )
   .option('-f, --force', 'Force removal without confirmation')
   .action(async (feature, options) => {
@@ -125,8 +129,8 @@ program
   .description('Clean up merged worktrees')
   .option(
     '-p, --path <path>',
-    'Path to worktrees directory (default: ./worktrees)',
-    './worktrees'
+    `Path to worktrees directory (default: ${defaultWorktreesPath})`,
+    defaultWorktreesPath
   )
   .option('-f, --force', 'Force cleanup without confirmation')
   .action(async (options) => {

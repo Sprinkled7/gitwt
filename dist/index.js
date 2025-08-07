@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 import chalk from 'chalk';
 import { Command } from 'commander';
+import path from 'path';
 import { WorktreeManager } from './worktree-manager.js';
 const program = new Command();
+// Default worktrees path: parent folder of current project
+const defaultWorktreesPath = path.join(process.cwd(), '..', 'worktrees');
 program
     .name('go-parallel')
     .description('CLI tool for managing Git worktrees')
-    .version('1.0.0');
+    .version('1.1.0');
 const worktreeManager = new WorktreeManager();
 // Create worktree command
 program
     .command('create')
     .description('Create a new Git worktree for a feature')
     .argument('<feature>', 'Feature name for the worktree')
-    .option('-p, --path <path>', 'Path to store worktrees (default: ./worktrees)', './worktrees')
+    .option('-p, --path <path>', `Path to store worktrees (default: ${defaultWorktreesPath})`, defaultWorktreesPath)
     .option('-b, --branch <branch>', 'Branch name (default: feature/<feature>)')
     .action(async (feature, options) => {
     try {
@@ -30,7 +33,7 @@ program
 program
     .command('list')
     .description('List all current worktrees')
-    .option('-p, --path <path>', 'Path to worktrees directory (default: ./worktrees)', './worktrees')
+    .option('-p, --path <path>', `Path to worktrees directory (default: ${defaultWorktreesPath})`, defaultWorktreesPath)
     .action(async (options) => {
     try {
         const worktrees = await worktreeManager.listWorktrees(options.path);
@@ -76,7 +79,7 @@ program
     .command('remove')
     .description('Remove a worktree')
     .argument('<feature>', 'Feature name of the worktree to remove')
-    .option('-p, --path <path>', 'Path to worktrees directory (default: ./worktrees)', './worktrees')
+    .option('-p, --path <path>', `Path to worktrees directory (default: ${defaultWorktreesPath})`, defaultWorktreesPath)
     .option('-f, --force', 'Force removal without confirmation')
     .action(async (feature, options) => {
     try {
@@ -92,7 +95,7 @@ program
 program
     .command('clean')
     .description('Clean up merged worktrees')
-    .option('-p, --path <path>', 'Path to worktrees directory (default: ./worktrees)', './worktrees')
+    .option('-p, --path <path>', `Path to worktrees directory (default: ${defaultWorktreesPath})`, defaultWorktreesPath)
     .option('-f, --force', 'Force cleanup without confirmation')
     .action(async (options) => {
     try {
