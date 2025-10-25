@@ -3,6 +3,9 @@ import { execa } from 'execa';
 import { existsSync, mkdirSync, readdirSync, statSync } from 'fs';
 import inquirer from 'inquirer';
 import { join, resolve } from 'path';
+import { EnvCopier } from './env-copier.js';
+import { PackageInstaller } from './package-installer.js';
+import { WorktreeOptions } from './types.js';
 
 export interface WorktreeInfo {
   name: string;
@@ -54,7 +57,8 @@ export class WorktreeManager {
   async createWorktree(
     feature: string,
     worktreesPath: string,
-    branch: string
+    branch: string,
+    options: WorktreeOptions = {}
   ): Promise<void> {
     await this.ensureGitRepo();
 
@@ -94,6 +98,9 @@ export class WorktreeManager {
       console.log(chalk.blue(`Created worktree: ${worktreeName}`));
       console.log(chalk.blue(`Path: ${worktreePath}`));
       console.log(chalk.blue(`Branch: ${branch}`));
+
+      // Post-creation tasks
+      await this.performPostCreationTasks(worktreePath, options);
     } catch (error) {
       // Cleanup if creation fails
       if (existsSync(worktreePath)) {
@@ -104,6 +111,33 @@ export class WorktreeManager {
         }
       }
       throw error;
+    }
+  }
+
+  private async performPostCreationTasks(
+    worktreePath: string,
+    options: WorktreeOptions
+  ): Promise<void> {
+    const envCopier = new EnvCopier();
+    const packageInstaller = new PackageInstaller();
+
+    try {
+      // Copy environment files if enabled
+      if (options.copyEnvFiles !== false) {
+        const currentDir = await this.runGitCommand(
+          'rev-parse --show-toplevel'
+        );
+        await envCopier.copyEnvFiles(currentDir, worktreePath);
+      }
+
+      // Install packages if enabled
+      if (options.installPackages !== false) {
+        await packageInstaller.installPackages(worktreePath);
+      }
+    } catch (error) {
+      console.error(
+        chalk.yellow(`Warning: Some post-creation tasks failed: ${error}`)
+      );
     }
   }
 

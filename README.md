@@ -12,6 +12,8 @@ A CLI tool built with TypeScript and Commander for managing Git worktrees effici
 - ✅ Automatic project name detection
 - ✅ Interactive confirmations
 - ✅ Beautiful colored output
+- ✅ **NEW**: Automatic environment file copying
+- ✅ **NEW**: Automatic package installation
 
 ## Installation
 
@@ -29,7 +31,7 @@ A CLI tool built with TypeScript and Commander for managing Git worktrees effici
    ```
 4. Test the installation:
    ```bash
-   go-parallel --help
+   gitwt --help
    ```
 
 ### Development Installation
@@ -60,55 +62,55 @@ For detailed installation instructions, see [INSTALLATION.md](./INSTALLATION.md)
 
 ```bash
 # Create a worktree for a feature
-go-parallel create my-feature
+gitwt new my-feature
 
 # Specify custom path and branch
-go-parallel create my-feature -p ./custom-worktrees -b feature/my-custom-branch
+gitwt new my-feature -p ./custom-worktrees -b feature/my-custom-branch
 ```
 
 ### List all worktrees
 
 ```bash
 # List worktrees in default location
-go-parallel list
+gitwt ls
 
 # List worktrees in custom location
-go-parallel list -p ./custom-worktrees
+gitwt ls -p ./custom-worktrees
 ```
 
 ### Merge worktrees
 
 ```bash
 # Merge multiple worktrees into main branch
-go-parallel merge ./worktrees/project-feature1 ./worktrees/project-feature2
+gitwt mrg ./worktrees/project-feature1 ./worktrees/project-feature2
 
 # Merge with custom target branch and message
-go-parallel merge ./worktrees/project-feature1 -t develop -m "Merge feature branches"
+gitwt mrg ./worktrees/project-feature1 -t develop -m "Merge feature branches"
 ```
 
 ### Remove a worktree
 
 ```bash
 # Remove a worktree with confirmation
-go-parallel remove my-feature
+gitwt rm my-feature
 
 # Force remove without confirmation
-go-parallel remove my-feature -f
+gitwt rm my-feature -f
 ```
 
 ### Clean up worktrees
 
 ```bash
 # Clean up merged worktrees with confirmation
-go-parallel clean
+gitwt clean
 
 # Force clean without confirmation
-go-parallel clean -f
+gitwt clean -f
 ```
 
 ## Commands
 
-### `create <feature>`
+### `new <feature>`
 
 Creates a new Git worktree for the specified feature.
 
@@ -116,15 +118,19 @@ Creates a new Git worktree for the specified feature.
 
 - `-p, --path <path>`: Path to store worktrees (default: `./worktrees`)
 - `-b, --branch <branch>`: Branch name (default: `feature/<feature>`)
+- `--no-copy-env`: Skip copying environment files
+- `--no-install-packages`: Skip installing packages
 
 **Example:**
 
 ```bash
-go-parallel create user-authentication
+gitwt new user-authentication
 # Creates: ./worktrees/project-user-authentication
+# Copies: .env, .env.local, .env.development, etc.
+# Installs: npm/yarn/pnpm packages (if package.json exists)
 ```
 
-### `list`
+### `ls`
 
 Lists all current worktrees with their status.
 
@@ -135,10 +141,10 @@ Lists all current worktrees with their status.
 **Example:**
 
 ```bash
-go-parallel list
+gitwt ls
 ```
 
-### `merge <paths...>`
+### `mrg <paths...>`
 
 Merges multiple worktrees by their paths.
 
@@ -150,10 +156,10 @@ Merges multiple worktrees by their paths.
 **Example:**
 
 ```bash
-go-parallel merge ./worktrees/project-feature1 ./worktrees/project-feature2 -t develop
+gitwt mrg ./worktrees/project-feature1 ./worktrees/project-feature2 -t develop
 ```
 
-### `remove <feature>`
+### `rm <feature>`
 
 Removes a worktree for the specified feature.
 
@@ -165,7 +171,7 @@ Removes a worktree for the specified feature.
 **Example:**
 
 ```bash
-go-parallel remove user-authentication
+gitwt rm user-authentication
 ```
 
 ### `clean`
@@ -188,7 +194,7 @@ Cleans up worktrees that have been merged into the main branch and are in a clea
 **Example:**
 
 ```bash
-go-parallel clean
+gitwt clean
 ```
 
 ## Workflow Example
@@ -196,7 +202,8 @@ go-parallel clean
 1. **Start a new feature:**
 
    ```bash
-   go-parallel create user-login
+   gitwt new user-login
+   # Automatically copies .env files and installs packages
    cd worktrees/project-user-login
    # Make your changes...
    git add .
@@ -206,7 +213,8 @@ go-parallel clean
 2. **Start another feature:**
 
    ```bash
-   go-parallel create user-registration
+   gitwt new user-registration
+   # Automatically copies .env files and installs packages
    cd worktrees/project-user-registration
    # Make your changes...
    git add .
@@ -216,18 +224,18 @@ go-parallel clean
 3. **Check your worktrees:**
 
    ```bash
-   go-parallel list
+   gitwt ls
    ```
 
 4. **Merge completed features:**
 
    ```bash
-   go-parallel merge ./worktrees/project-user-login ./worktrees/project-user-registration
+   gitwt mrg ./worktrees/project-user-login ./worktrees/project-user-registration
    ```
 
 5. **Clean up merged worktrees:**
    ```bash
-   go-parallel clean
+   gitwt clean
    ```
 
 ## Project Structure
@@ -235,9 +243,14 @@ go-parallel clean
 ```
 go-parallel/
 ├── src/
-│   ├── index.ts          # CLI entry point
-│   └── worktree-manager.ts # Core worktree management logic
-├── dist/                 # Compiled JavaScript
+│   ├── index.ts              # CLI entry point
+│   ├── worktree-manager.ts   # Core worktree management logic
+│   ├── env-copier.ts         # Environment file copying utilities
+│   ├── package-installer.ts  # Package installation utilities
+│   ├── config.ts             # Configuration constants
+│   └── types.ts              # Type definitions
+├── tests/                    # Test files
+├── dist/                     # Compiled JavaScript
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -262,6 +275,12 @@ npm run build
 
 # Run the built version
 npm start
+
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:run
 ```
 
 ## License

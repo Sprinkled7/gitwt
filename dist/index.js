@@ -9,7 +9,7 @@ const defaultWorktreesPath = path.join(process.cwd(), '..', 'worktrees');
 program
     .name('go-parallel')
     .description('CLI tool for managing Git worktrees')
-    .version('1.1.0');
+    .version('1.2.0');
 const worktreeManager = new WorktreeManager();
 // Create worktree command
 program
@@ -18,10 +18,15 @@ program
     .argument('<feature>', 'Feature name for the worktree')
     .option('-p, --path <path>', `Path to store worktrees (default: ${defaultWorktreesPath})`, defaultWorktreesPath)
     .option('-b, --branch <branch>', 'Branch name (default: feature/<feature>)')
+    .option('--no-copy-env', 'Skip copying environment files')
+    .option('--no-install-packages', 'Skip installing packages')
     .action(async (feature, options) => {
     try {
         const branch = options.branch || `feature/${feature}`;
-        await worktreeManager.createWorktree(feature, options.path, branch);
+        await worktreeManager.createWorktree(feature, options.path, branch, {
+            copyEnvFiles: options.copyEnv,
+            installPackages: options.installPackages,
+        });
         console.log(chalk.green(`✓ Worktree created successfully for feature: ${feature}`));
     }
     catch (error) {

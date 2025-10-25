@@ -1,6 +1,6 @@
-# Installation Guide - Running go-parallel Globally
+# Installation Guide - Running gitwt Globally
 
-This guide shows you how to install and run the `go-parallel` CLI tool globally on your local machine.
+This guide shows you how to install and run the `gitwt` CLI tool globally on your local machine.
 
 ## Prerequisites
 
@@ -13,8 +13,8 @@ This guide shows you how to install and run the `go-parallel` CLI tool globally 
 This method creates a symbolic link, so any changes you make to the source code will be immediately available.
 
 ```bash
-# Navigate to the go-parallel directory
-cd /path/to/go-parallel
+# Navigate to the gitwt directory
+cd /path/to/gitwt
 
 # Build the project
 npm run build
@@ -23,7 +23,7 @@ npm run build
 npm link
 
 # Test the installation
-go-parallel --help
+gitwt --help
 ```
 
 **To unlink later:**
@@ -37,8 +37,8 @@ npm unlink
 This method installs the package globally on your system.
 
 ```bash
-# Navigate to the go-parallel directory
-cd /path/to/go-parallel
+# Navigate to the gitwt directory
+cd /path/to/gitwt
 
 # Build the project
 npm run build
@@ -47,20 +47,20 @@ npm run build
 npm install -g .
 
 # Test the installation
-go-parallel --help
+gitwt --help
 ```
 
 **To uninstall:**
 
 ```bash
-npm uninstall -g go-parallel
+npm uninstall -g gitwt
 ```
 
 ## Method 3: Using yarn (if you prefer yarn)
 
 ```bash
-# Navigate to the go-parallel directory
-cd /path/to/go-parallel
+# Navigate to the gitwt directory
+cd /path/to/gitwt
 
 # Build the project
 npm run build
@@ -69,7 +69,7 @@ npm run build
 yarn global add .
 
 # Test the installation
-go-parallel --help
+gitwt --help
 ```
 
 ## Method 4: Manual Installation
@@ -77,8 +77,8 @@ go-parallel --help
 If you want to install it manually:
 
 ```bash
-# Navigate to the go-parallel directory
-cd /path/to/go-parallel
+# Navigate to the gitwt directory
+cd /path/to/gitwt
 
 # Build the project
 npm run build
@@ -87,10 +87,10 @@ npm run build
 chmod +x dist/index.js
 
 # Create a symbolic link manually
-sudo ln -s $(pwd)/dist/index.js /usr/local/bin/go-parallel
+sudo ln -s $(pwd)/dist/index.js /usr/local/bin/gitwt
 
 # Test the installation
-go-parallel --help
+gitwt --help
 ```
 
 ## Method 5: Using npx (No Installation Required)
@@ -98,8 +98,8 @@ go-parallel --help
 You can run the tool without installing it globally:
 
 ```bash
-# Navigate to the go-parallel directory
-cd /path/to/go-parallel
+# Navigate to the gitwt directory
+cd /path/to/gitwt
 
 # Build the project
 npm run build
@@ -114,13 +114,13 @@ After installation, verify that the tool is working:
 
 ```bash
 # Check if the command is available
-which go-parallel
+which gitwt
 
 # Test the help command
-go-parallel --help
+gitwt --help
 
 # Test creating a worktree (in a Git repository)
-go-parallel create test-feature
+gitwt new test-feature
 ```
 
 ## Troubleshooting
@@ -162,19 +162,19 @@ Once installed globally, you can use the tool from any directory:
 
 ```bash
 # Create a worktree
-go-parallel create my-feature
+gitwt new my-feature
 
 # List worktrees
-go-parallel list
+gitwt ls
 
 # Merge worktrees
-go-parallel merge worktrees/project-feature1 worktrees/project-feature2
+gitwt mrg worktrees/project-feature1 worktrees/project-feature2
 
 # Remove a worktree
-go-parallel remove my-feature
+gitwt rm my-feature
 
 # Clean up merged worktrees
-go-parallel clean
+gitwt clean
 ```
 
 ## Development
@@ -182,7 +182,7 @@ go-parallel clean
 For development, use `npm link` as it allows you to make changes to the source code and see them immediately without reinstalling:
 
 ```bash
-# In the go-parallel directory
+# In the gitwt directory
 npm run build
 npm link
 

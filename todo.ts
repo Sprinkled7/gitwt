@@ -12,5 +12,9 @@ const todo = [
   `notice no merged will not be clear`,
   `copy .env when create worktress`,
   `install package`,
-  `open them`,
+  `open them with code`,
+  `how to subcommand auto complete, long command hard to type, especially no fish used`,
+  `copy env files ,after create worktree success`, // ✅ DONE
+  `install packages after make worktree success`, // ✅ DONE
+  `support other programming languages`,
 ];

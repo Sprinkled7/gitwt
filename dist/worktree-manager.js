@@ -3,6 +3,8 @@ import { execa } from 'execa';
 import { existsSync, mkdirSync, readdirSync, statSync } from 'fs';
 import inquirer from 'inquirer';
 import { join, resolve } from 'path';
+import { EnvCopier } from './env-copier.js';
+import { PackageInstaller } from './package-installer.js';
 export class WorktreeManager {
     async runGitCommand(command, cwd) {
         try {
@@ -39,7 +41,7 @@ export class WorktreeManager {
             return 'project';
         }
     }
-    async createWorktree(feature, worktreesPath, branch) {
+    async createWorktree(feature, worktreesPath, branch, options = {}) {
         await this.ensureGitRepo();
         // Check if we're already in a worktree
         try {
@@ -69,6 +71,8 @@ export class WorktreeManager {
             console.log(chalk.blue(`Created worktree: ${worktreeName}`));
             console.log(chalk.blue(`Path: ${worktreePath}`));
             console.log(chalk.blue(`Branch: ${branch}`));
+            // Post-creation tasks
+            await this.performPostCreationTasks(worktreePath, options);
         }
         catch (error) {
             // Cleanup if creation fails
@@ -81,6 +85,24 @@ export class WorktreeManager {
                 }
             }
             throw error;
+        }
+    }
+    async performPostCreationTasks(worktreePath, options) {
+        const envCopier = new EnvCopier();
+        const packageInstaller = new PackageInstaller();
+        try {
+            // Copy environment files if enabled
+            if (options.copyEnvFiles !== false) {
+                const currentDir = await this.runGitCommand('rev-parse --show-toplevel');
+                await envCopier.copyEnvFiles(currentDir, worktreePath);
+            }
+            // Install packages if enabled
+            if (options.installPackages !== false) {
+                await packageInstaller.installPackages(worktreePath);
+            }
+        }
+        catch (error) {
+            console.error(chalk.yellow(`Warning: Some post-creation tasks failed: ${error}`));
         }
     }
     async listWorktrees(worktreesPath) {

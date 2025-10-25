@@ -11,15 +11,15 @@ const program = new Command();
 const defaultWorktreesPath = path.join(process.cwd(), '..', 'worktrees');
 
 program
-  .name('go-parallel')
+  .name('gitwt')
   .description('CLI tool for managing Git worktrees')
-  .version('1.1.0');
+  .version('1.2.0');
 
 const worktreeManager = new WorktreeManager();
 
 // Create worktree command
 program
-  .command('create')
+  .command('new')
   .description('Create a new Git worktree for a feature')
   .argument('<feature>', 'Feature name for the worktree')
   .option(
@@ -28,10 +28,15 @@ program
     defaultWorktreesPath
   )
   .option('-b, --branch <branch>', 'Branch name (default: feature/<feature>)')
+  .option('--no-copy-env', 'Skip copying environment files')
+  .option('--no-install-packages', 'Skip installing packages')
   .action(async (feature, options) => {
     try {
       const branch = options.branch || `feature/${feature}`;
-      await worktreeManager.createWorktree(feature, options.path, branch);
+      await worktreeManager.createWorktree(feature, options.path, branch, {
+        copyEnvFiles: options.copyEnv,
+        installPackages: options.installPackages,
+      });
       console.log(
         chalk.green(`✓ Worktree created successfully for feature: ${feature}`)
       );
@@ -43,7 +48,7 @@ program
 
 // List worktrees command
 program
-  .command('list')
+  .command('ls')
   .description('List all current worktrees')
   .option(
     '-p, --path <path>',
@@ -76,7 +81,7 @@ program
 
 // Merge worktrees command
 program
-  .command('merge')
+  .command('mrg')
   .description('Merge multiple worktrees by paths')
   .argument('<paths...>', 'Paths to worktrees to merge')
   .option(
@@ -100,7 +105,7 @@ program
 
 // Remove worktree command
 program
-  .command('remove')
+  .command('rm')
   .description('Remove a worktree')
   .argument('<feature>', 'Feature name of the worktree to remove')
   .option(
