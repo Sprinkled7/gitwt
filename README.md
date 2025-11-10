@@ -1,6 +1,6 @@
 # Go Parallel - Git Worktree Manager
 
-A CLI tool built with TypeScript and Commander for managing Git worktrees efficiently. This tool helps you create, list, merge, and manage multiple Git worktrees for parallel development.
+A CLI tool for managing Git worktrees efficiently, and with a few convenient features.
 
 ## Features
 
