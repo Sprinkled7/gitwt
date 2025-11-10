@@ -7,13 +7,13 @@ const program = new Command();
 // Default worktrees path: parent folder of current project
 const defaultWorktreesPath = path.join(process.cwd(), '..', 'worktrees');
 program
-    .name('go-parallel')
+    .name('gitwt')
     .description('CLI tool for managing Git worktrees')
     .version('1.2.0');
 const worktreeManager = new WorktreeManager();
 // Create worktree command
 program
-    .command('create')
+    .command('new')
     .description('Create a new Git worktree for a feature')
     .argument('<feature>', 'Feature name for the worktree')
     .option('-p, --path <path>', `Path to store worktrees (default: ${defaultWorktreesPath})`, defaultWorktreesPath)
@@ -36,7 +36,7 @@ program
 });
 // List worktrees command
 program
-    .command('list')
+    .command('ls')
     .description('List all current worktrees')
     .option('-p, --path <path>', `Path to worktrees directory (default: ${defaultWorktreesPath})`, defaultWorktreesPath)
     .action(async (options) => {
@@ -63,7 +63,7 @@ program
 });
 // Merge worktrees command
 program
-    .command('merge')
+    .command('mrg')
     .description('Merge multiple worktrees by paths')
     .argument('<paths...>', 'Paths to worktrees to merge')
     .option('-t, --target <target>', 'Target branch to merge into (default: main)', 'main')
@@ -81,7 +81,7 @@ program
 });
 // Remove worktree command
 program
-    .command('remove')
+    .command('rm')
     .description('Remove a worktree')
     .argument('<feature>', 'Feature name of the worktree to remove')
     .option('-p, --path <path>', `Path to worktrees directory (default: ${defaultWorktreesPath})`, defaultWorktreesPath)

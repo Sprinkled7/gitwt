@@ -1,144 +1,117 @@
-# Go Parallel - Git Worktree Manager
+# GitWT - Git 工作树管理器
 
-A CLI tool for managing Git worktrees efficiently, and with a few convenient features.
+一个用于高效管理 Git 工作树的 CLI 工具，并提供一些方便的功能。
 
-## Features
+## 功能特性
 
-- ✅ Create Git worktrees for new features
-- ✅ List all current worktrees with status
-- ✅ Merge multiple worktrees by paths
-- ✅ Remove worktrees safely
-- ✅ Clean up merged worktrees
-- ✅ Automatic project name detection
-- ✅ Interactive confirmations
-- ✅ Beautiful colored output
-- ✅ **NEW**: Automatic environment file copying
-- ✅ **NEW**: Automatic package installation
+- ✅ 为新功能创建 Git 工作树,默认在父级创建,不影响当前 git.
+- ✅ 列出所有当前工作树及其状态
+- ✅ 按路径合并多个工作树
+- ✅ 安全删除工作树
+- ✅ 清理已合并的工作树
+- ✅ 自动项目名称检测
+- ✅ 交互式确认
+- ✅ 美观的彩色输出
+- ✅ **新功能**：自动复制环境文件
+- ✅ **新功能**：自动安装依赖
 
-## Installation
+## 安装
 
-### Quick Start (Global Installation)
-
-1. Clone this repository or download the files
-2. Install dependencies and build:
-   ```bash
-   npm install
-   npm run build
-   ```
-3. Install globally:
-   ```bash
-   npm install -g .
-   ```
-4. Test the installation:
-   ```bash
-   gitwt --help
-   ```
-
-### Development Installation
-
-1. Clone this repository or download the files
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Build the project:
-   ```bash
-   npm run build
-   ```
-4. Create a global link (for development):
-   ```bash
-   npm link
-   ```
-5. Make the CLI executable:
-   ```bash
-   chmod +x dist/index.js
-   ```
-
-For detailed installation instructions, see [INSTALLATION.md](./INSTALLATION.md).
-
-## Usage
-
-### Create a new worktree
+使用 npm 全局安装：
 
 ```bash
-# Create a worktree for a feature
+npm install -g @sprinkled7/gitwt
+```
+
+安装完成后，可以使用 `gitwt` 命令：
+
+```bash
+gitwt --help
+```
+
+## 使用方法
+
+### 创建新工作树
+
+```bash
+# 为功能创建工作树
 gitwt new my-feature
 
-# Specify custom path and branch
+# 指定自定义路径和分支
 gitwt new my-feature -p ./custom-worktrees -b feature/my-custom-branch
 ```
 
-### List all worktrees
+### 列出所有工作树
 
 ```bash
-# List worktrees in default location
+# 列出默认位置的工作树
 gitwt ls
 
-# List worktrees in custom location
+# 列出自定义位置的工作树
 gitwt ls -p ./custom-worktrees
 ```
 
-### Merge worktrees
+### 合并工作树
 
 ```bash
-# Merge multiple worktrees into main branch
+# 将多个工作树合并到主分支
 gitwt mrg ./worktrees/project-feature1 ./worktrees/project-feature2
 
-# Merge with custom target branch and message
-gitwt mrg ./worktrees/project-feature1 -t develop -m "Merge feature branches"
+# 使用自定义目标分支和消息进行合并
+gitwt mrg ./worktrees/project-feature1 -t develop -m "合并功能分支"
 ```
 
-### Remove a worktree
+### 删除工作树
 
 ```bash
-# Remove a worktree with confirmation
+# 删除工作树（带确认）
 gitwt rm my-feature
 
-# Force remove without confirmation
+# 强制删除（无需确认）
 gitwt rm my-feature -f
 ```
 
-### Clean up worktrees
+### 清理工作树
 
 ```bash
-# Clean up merged worktrees with confirmation
+# 清理已合并的工作树（带确认）
 gitwt clean
 
-# Force clean without confirmation
+# 强制清理（无需确认）
 gitwt clean -f
 ```
 
-## Commands
+## 命令说明
 
 ### `new <feature>`
 
-Creates a new Git worktree for the specified feature.
+为指定功能创建新的 Git 工作树。
 
-**Options:**
+**选项：**
 
-- `-p, --path <path>`: Path to store worktrees (default: `./worktrees`)
-- `-b, --branch <branch>`: Branch name (default: `feature/<feature>`)
-- `--no-copy-env`: Skip copying environment files
-- `--no-install-packages`: Skip installing packages
+- `-p, --path <path>`: 存储工作树的路径（默认：`../worktrees`）
+- `-b, --branch <branch>`: 分支名称（默认：`feature/<feature>`）
+- `--no-copy-env`: 跳过复制环境文件
+- `--no-install-packages`: 跳过安装包
 
-**Example:**
+**示例：**
 
 ```bash
 gitwt new user-authentication
-# Creates: ./worktrees/project-user-authentication
-# Copies: .env, .env.local, .env.development, etc.
-# Installs: npm/yarn/pnpm packages (if package.json exists)
+# 创建：./worktrees/project-user-authentication
+# 复制：.env, .env.local, .env.development 等
+# 安装：npm/yarn/pnpm 包（如果存在 package.json）
 ```
 
 ### `ls`
 
-Lists all current worktrees with their status.
+列出所有当前工作树及其状态。
 
-**Options:**
+**选项：**
 
-- `-p, --path <path>`: Path to worktrees directory (default: `./worktrees`)
+- `-p, --path <path>`: 工作树目录路径（默认：`./worktrees`）
 
-**Example:**
+**示例：**
 
 ```bash
 gitwt ls
@@ -146,14 +119,14 @@ gitwt ls
 
 ### `mrg <paths...>`
 
-Merges multiple worktrees by their paths.
+按路径合并多个工作树。
 
-**Options:**
+**选项：**
 
-- `-t, --target <target>`: Target branch to merge into (default: `main`)
-- `-m, --message <message>`: Merge commit message
+- `-t, --target <target>`: 要合并到的目标分支（默认：`main`）
+- `-m, --message <message>`: 合并提交消息
 
-**Example:**
+**示例：**
 
 ```bash
 gitwt mrg ./worktrees/project-feature1 ./worktrees/project-feature2 -t develop
@@ -161,14 +134,14 @@ gitwt mrg ./worktrees/project-feature1 ./worktrees/project-feature2 -t develop
 
 ### `rm <feature>`
 
-Removes a worktree for the specified feature.
+删除指定功能的工作树。
 
-**Options:**
+**选项：**
 
-- `-p, --path <path>`: Path to worktrees directory (default: `./worktrees`)
-- `-f, --force`: Force removal without confirmation
+- `-p, --path <path>`: 工作树目录路径（默认：`./worktrees`）
+- `-f, --force`: 强制删除，无需确认
 
-**Example:**
+**示例：**
 
 ```bash
 gitwt rm user-authentication
@@ -176,113 +149,54 @@ gitwt rm user-authentication
 
 ### `clean`
 
-Cleans up worktrees that have been merged into the main branch and are in a clean state.
+清理已合并到主分支且处于干净状态的工作树。
 
-**Options:**
+**选项：**
 
-- `-p, --path <path>`: Path to worktrees directory (default: `./worktrees`)
-- `-f, --force`: Force cleanup without confirmation
+- `-p, --path <path>`: 工作树目录路径（默认：`./worktrees`）
+- `-f, --force`: 强制清理，无需确认
 
-**What it does:**
+**功能说明：**
 
-- Only removes worktrees whose branches have been merged into the main branch
-- Skips worktrees with uncommitted changes
-- Skips worktrees whose branches haven't been merged yet
-- Deletes both the worktree and the merged branch
-- Provides clear feedback about what's being skipped and why
+- 仅删除已合并到主分支的工作树
+- 跳过有未提交更改的工作树
+- 跳过尚未合并的分支的工作树
+- 同时删除工作树和已合并的分支
+- 提供清晰的反馈，说明跳过哪些内容及原因
 
-**Example:**
+**示例：**
 
 ```bash
 gitwt clean
 ```
 
-## Workflow Example
-
-1. **Start a new feature:**
-
-   ```bash
-   gitwt new user-login
-   # Automatically copies .env files and installs packages
-   cd worktrees/project-user-login
-   # Make your changes...
-   git add .
-   git commit -m "Add user login functionality"
-   ```
-
-2. **Start another feature:**
-
-   ```bash
-   gitwt new user-registration
-   # Automatically copies .env files and installs packages
-   cd worktrees/project-user-registration
-   # Make your changes...
-   git add .
-   git commit -m "Add user registration functionality"
-   ```
-
-3. **Check your worktrees:**
-
-   ```bash
-   gitwt ls
-   ```
-
-4. **Merge completed features:**
-
-   ```bash
-   gitwt mrg ./worktrees/project-user-login ./worktrees/project-user-registration
-   ```
-
-5. **Clean up merged worktrees:**
-   ```bash
-   gitwt clean
-   ```
-
-## Project Structure
-
-```
-go-parallel/
-├── src/
-│   ├── index.ts              # CLI entry point
-│   ├── worktree-manager.ts   # Core worktree management logic
-│   ├── env-copier.ts         # Environment file copying utilities
-│   ├── package-installer.ts  # Package installation utilities
-│   ├── config.ts             # Configuration constants
-│   └── types.ts              # Type definitions
-├── tests/                    # Test files
-├── dist/                     # Compiled JavaScript
-├── package.json
-├── tsconfig.json
-└── README.md
-```
-
-## Requirements
+## 系统要求
 
 - Node.js 18+
 - Git
 
-## Development
+## 开发
 
 ```bash
-# Install dependencies
+# 安装依赖
 npm install
 
-# Run in development mode
+# 开发模式运行
 npm run dev
 
-# Build for production
+# 构建生产版本
 npm run build
 
-# Run the built version
+# 运行构建后的版本
 npm start
 
-# Run tests
+# 运行测试
 npm test
 
-# Run tests in watch mode
+# 监视模式运行测试
 npm run test:run
 ```
 
-## License
+## 许可证
 
-MIT
+Apache-2.0 license

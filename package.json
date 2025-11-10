@@ -1,6 +1,6 @@
 {
-  "name": "go-parallel",
-  "version": "1.1.0",
+  "name": "@sprinkled7/gitwt",
+  "version": "1.1.1",
   "description": "CLI tool for managing Git worktrees",
   "main": "dist/index.js",
   "type": "module",
@@ -18,8 +18,12 @@
     "cli",
     "parallel"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "sprinkled7",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sprinkled7/gitwt.git"
+  },
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
